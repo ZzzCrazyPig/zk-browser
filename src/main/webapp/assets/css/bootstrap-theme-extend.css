@@ -1,0 +1,53 @@
+.navbar-primary {
+	background-image: linear-gradient(to bottom, #428BCA 0%, #2D6CA2 100%);
+	background-repeat: repeat-x;
+	border-color: #2b669a;
+}
+
+.navbar-success {
+	background-image: linear-gradient(to bottom, #5CB85C 0%, #419641 100%);
+	background-repeat: repeat-x;
+	border-color: #3e8f3e;
+}
+
+.navbar-warning {
+	background-image: linear-gradient(to bottom, #F0AD4E 0%, #EB9316 100%);
+	background-repeat: repeat-x;
+	border-color: #e38d13;
+}
+
+.navbar-danger {
+	background-image: linear-gradient(to bottom, #D9534F 0%, #C12E2A 100%);
+	background-repeat: repeat-x;
+	border-color: #b92c28;
+}
+
+.navbar-info {
+	background-image: linear-gradient(to bottom, #5BC0DE 0%, #2AABD2 100%);
+	background-repeat: repeat-x;
+	border-color: #28a4c9;
+}
+
+.navbar-default {
+	background-image: linear-gradient(to bottom, #FFF 0%, #E0E0E0 100%);
+	background-repeat: repeat-x;
+	border-color: #d4d4d4;
+}
+
+.panel-success .panel-heading {
+	background-image: linear-gradient(to bottom, #5CB85C 0%, #419641 100%);
+	background-repeat: repeat-x;
+	border-color: #3e8f3e;
+}
+
+.panel-danger .panel-heading {
+	background-image: linear-gradient(to bottom, #D9534F 0%, #C12E2A 100%);
+	background-repeat: repeat-x;
+	border-color: #b92c28;
+}
+
+.panel-warning .panel-heading {
+	background-image: linear-gradient(to bottom, #F0AD4E 0%, #EB9316 100%);
+	background-repeat: repeat-x;
+	border-color: #e38d13;
+}

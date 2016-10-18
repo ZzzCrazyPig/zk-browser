@@ -1,0 +1,30 @@
+.btn,
+.label,
+.dropdown-menu,
+.nav-tabs > li > a,
+.nav-pills > li > a,
+.navbar,
+.breadcrumb,
+.pagination,
+.pagination > li:first-child > a, .pagination > li:first-child > span,
+.pagination > li:last-child > a, .pagination > li:last-child > span,
+.pager li > a, .pager li > span,
+.container .jumbotron, .container-fluid .jumbotron,
+.alert,
+.progress,
+.list-group,
+.list-group-item:first-child,
+.list-group-item:last-child,
+.panel,
+.panel-heading,
+.panel-footer,
+.thumbnail,
+.well,
+.modal-content,
+input,
+select,
+textarea
+{
+	border-radius: 0px !important;
+	-webkit-border-radius: 0px !important;
+}
