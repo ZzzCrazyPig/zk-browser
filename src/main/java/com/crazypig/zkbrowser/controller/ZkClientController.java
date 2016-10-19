@@ -15,8 +15,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.crazypig.zkbrowser.entity.AppResult;
 import com.crazypig.zkbrowser.entity.ZkNodeInfo;
 
+/**
+ * 
+ * @author CrazyPig
+ * @since 2016-10-18
+ *
+ */
 @Controller
 public class ZkClientController {
 	
@@ -43,23 +50,40 @@ public class ZkClientController {
 	
 	@RequestMapping("/ls")
 	@ResponseBody
-	public String[] ls(@RequestParam String path) throws Exception {
-		List<String> subPathList = zkClient.getChildren().forPath(path);
-		String[] subPathArr = new String[subPathList.size()];
-		subPathList.toArray(subPathArr);
-		return subPathArr;
+	public AppResult ls(@RequestParam String path) {
+		AppResult result = null;
+		List<String> subPathList = null;
+		try {
+			subPathList = zkClient.getChildren().forPath(path);
+			String[] subPathArr = new String[subPathList.size()];
+			subPathList.toArray(subPathArr);
+			result = AppResult.buildSucessResult(subPathArr);
+		} catch (Exception e) {
+//			e.printStackTrace();
+			result = AppResult.buildErrorResult(e.getMessage());
+		}
+		return result;
 	}
 	
 	@RequestMapping("/get")
 	@ResponseBody
-	public ZkNodeInfo get(@RequestParam String path) throws Exception {
-		Stat stat = zkClient.checkExists().forPath(path);
-		byte[] data = zkClient.getData().forPath(path);
-		ZkNodeInfo zkNodeInfo = new ZkNodeInfo();
-		zkNodeInfo.setData(data);
-		zkNodeInfo.setDataAsString(new String(data));
-		zkNodeInfo.setStat(stat);
-		return zkNodeInfo;
+	public AppResult get(@RequestParam String path) {
+		Stat stat;
+		byte[] data = null;
+		AppResult result = null;
+		try {
+			stat = zkClient.checkExists().forPath(path);
+			data = zkClient.getData().forPath(path);
+			ZkNodeInfo zkNodeInfo = new ZkNodeInfo();
+			zkNodeInfo.setData(data);
+			zkNodeInfo.setDataAsString(new String(data));
+			zkNodeInfo.setStat(stat);
+			result = AppResult.buildSucessResult(zkNodeInfo);
+		} catch (Exception e) {
+//			e.printStackTrace();
+			result = AppResult.buildErrorResult(e.getMessage());
+		}
+		return result;
 	}
 	
 	private static CuratorFramework getZkClient() {
