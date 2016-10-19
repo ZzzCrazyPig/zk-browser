@@ -86,18 +86,15 @@
 			listZkPathBtn.click(function(){
 				var path = zkPathInput.val();
 				path = path.replace(/\s/g, "");
-				console.info("ls path : " + path);
 				ls(path, processCurPath);
 			});
 			
 			curZkPath.on('click', 'a.jumpInto', function(e){
 				var index = $(this).parent().index();
-				// console.info("index = " + index);
 				jumpInto(index);
 			});
 			
 			dirListTable.on('click', 'a.cdUp', function(e){
-				// console.info("on cdUp, curPath : " + curPath);
 				if(curPath.length == 1) { 
 					return;
 				}
@@ -105,7 +102,6 @@
 			});
 			
 			dirListTable.on('click', 'a.cdInto', function(e){
-				// console.info("on cdInto, curPath : " + curPath);
 				var cdDir = $(this).text();
 				var lastDir = curPath[curPath.length - 1];
 				curPath.push(cdDir);
@@ -126,9 +122,10 @@
 			});
 			
 			var jumpInto = function(index) {
-				for(var i = index + 1; i < curPath.length; i++) {
+				var len = curPath.length;
+				for(var i = index + 1; i < len; i++) {
 					curPath.pop();
-					curZkPath.children().eq(i).remove();
+					curZkPath.children().last().remove();
 				}
 				var lastChild = curZkPath.children().last();
 				lastChild.addClass('active')
@@ -136,7 +133,6 @@
 							.children()
 							.remove();
 				var path = getPath(curPath);
-				console.info("will jump into : " + path);
 				ls(path);
 			};
 			
@@ -152,7 +148,6 @@
 					splitArr.shift();
 					curPath = curPath.concat(splitArr);
 				}
-				console.info(curPath);
 				// remove all
 				curZkPath.children().remove();
 				for(var i = 0; i < curPath.length; i++) {
@@ -174,7 +169,6 @@
 						return;
 					}
 					showDirList(resp.row);
-					debugger;
 					if(callback != null && typeof callback === 'function') {
 						callback(path);
 					}
@@ -185,7 +179,6 @@
 				$.get('get', {
 					path: path
 				}, function(resp){
-					console.info(resp);
 					if(!resp.success) {
 						showErrMsg(resp.errorMessage);
 						return;
