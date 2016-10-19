@@ -1,13 +1,13 @@
-## Introduction
+# Introduction
 
 zk-browser make it easy to browse zookeeper directory content in web ui, rather than using the zkCli.sh command!
 
-## Requirements
+# Requirements
 
 - jdk7
 - maven
 
-## Usage
+# Usage
 
 First, download the source code, and run maven command to build the code in root directory:
 
@@ -37,9 +37,9 @@ cd zk-browser/bin
 
 On Windows, run `start.bat` instead.
 
-Open your web browser, visit ![localhost:8080/zk-browser](localhost:8080/zk-browser)
+Open your web browser, visit [http://localhost:8080/zk-browser](http://localhost:8080/zk-browser)
 
-## Technology Stack
+# Technology Stack
 
 - spring mvc
 - embedded jetty
