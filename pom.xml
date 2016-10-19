@@ -4,7 +4,7 @@
 	<groupId>com.crazypig</groupId>
 	<artifactId>zk-browser</artifactId>
 	<packaging>war</packaging>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0</version>
 	<name>zk browser</name>
 	<url>http://maven.apache.org</url>
 
