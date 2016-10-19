@@ -17,10 +17,12 @@
 	</files>
 	<fileSets>
 		<fileSet>
-			<directory>src\main\resources</directory>
+			<directory>src\main\assembly\conf</directory>
 			<outputDirectory>\conf</outputDirectory>
-			<!-- <includes> <include>some/path</include> </includes> <excludes> <exclude>some/path1</exclude> 
-				</excludes> -->
+			<!-- <includes> <include>some/path</include> </includes> -->
+			<!-- <excludes> 
+				<exclude>some/path</exclude> 
+			</excludes> -->
 		</fileSet>
 		<fileSet>
 			<directory>src\main\assembly\bin</directory>
