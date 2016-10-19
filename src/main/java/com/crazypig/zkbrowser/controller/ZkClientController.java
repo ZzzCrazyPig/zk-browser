@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.crazypig.zkbrowser.conf.SystemConfig;
 import com.crazypig.zkbrowser.entity.AppResult;
 import com.crazypig.zkbrowser.entity.ZkNodeInfo;
 
@@ -28,7 +29,7 @@ import com.crazypig.zkbrowser.entity.ZkNodeInfo;
 public class ZkClientController {
 	
 	private final static Logger LOGGER = Logger.getLogger(ZkClientController.class);
-	private static String connectString = "10.202.7.88:2181,10.202.7.88:2182,10.202.7.88:2183";
+	private static String connectString = "localhost:2181";
 	private CuratorFramework zkClient = null;
 	
 	public ZkClientController() {
@@ -37,7 +38,11 @@ public class ZkClientController {
 	
 	@PostConstruct
 	public void init() {
-		LOGGER.info("init zk client");
+		String _connectString = SystemConfig.getProperty("zkUrl");
+		if(_connectString != null && !_connectString.isEmpty()) {
+			connectString = _connectString;
+		}
+		LOGGER.info("init zk client, zkUrl : " + connectString);
 		zkClient = getZkClient();
 		zkClient.start();
 	}
@@ -90,7 +95,7 @@ public class ZkClientController {
 		CuratorFramework client = CuratorFrameworkFactory.builder()
 				.connectString(connectString)
 				.retryPolicy(new RetryNTimes(3, 1000))
-				.connectionTimeoutMs(5000)
+				.connectionTimeoutMs(3000)
 				.build();
 		return client;
 	}
