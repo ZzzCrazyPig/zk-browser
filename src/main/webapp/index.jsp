@@ -20,10 +20,11 @@
 <script src="js/jquery-ui-1.9.2-min.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/bootstrap-dialog.min.js"></script>
+<script src="js/jquery-dateFormat.min.js"></script>
 </head>
 
 <body>
-	<nav class="navbar navbar-default">
+	<nav class="navbar navbar-success">
 		<div class="container-fluid">
 			<div class="navbar-header">
 				<button type="button" class="navbar-toggle collapsed"
@@ -48,21 +49,17 @@
 							<input id="zkPathInput" class="form-control"
 								placeholder="please input a zk path">
 							<span class="input-group-btn">
-								<button id="listZkPathBtn" class="btn btn-default">search</button>
+								<button id="listZkPathBtn" class="btn btn-primary">search</button>
 							</span>
 						</div>
 					</div>
+					<div id="alertArea" class="alert alert-danger" hidden>error</div>
 					<ol id="curZkPath" class="breadcrumb">
-						<li><a href="#">Home</a></li>
-						<li><a href="#">Library</a></li>
-						<li class="active">Data</li>
+						<li class="active">/</li>
 					</ol>
 					<br />
 					<table id="dirListTable" class="table">
 						<tr><td><a href="#">...</a></td></tr> <!-- return back -->
-						<tr><td><a href="#">dir1</a></td></tr>
-						<tr><td><a href="#">dir1</a></td></tr>
-						<tr><td><a href="#">dir1</a></td></tr>
 					</table>
 				</div>
 			</div>
@@ -74,36 +71,47 @@
 		$(document).ready(function() {
 			
 			var zkPathInput = $('#zkPathInput');
+			var listZkPathBtn = $('#listZkPathBtn');
+			var alertArea = $('#alertArea');
 			var curZkPath = $('#curZkPath');
 			var dirListTable = $('#dirListTable');
-			var curPath = [];
+			var curPath = ["/"];
 			
-			$('#listZkPathBtn').click(function(){
+			zkPathInput.bind('keypress', function(event){
+				if(event.keyCode == "13") {
+					listZkPathBtn.click();
+				}
+			});
+			
+			listZkPathBtn.click(function(){
 				var path = zkPathInput.val();
-				ls(path);
+				path = path.replace(/\s/g, "");
+				console.info("ls path : " + path);
+				ls(path, processCurPath);
 			});
 			
 			curZkPath.on('click', 'a.jumpInto', function(e){
 				var index = $(this).parent().index();
-				console.info("index = " + index);
+				// console.info("index = " + index);
 				jumpInto(index);
 			});
 			
 			dirListTable.on('click', 'a.cdUp', function(e){
-				console.info("on cdUp, curPath : " + curPath);
+				// console.info("on cdUp, curPath : " + curPath);
 				if(curPath.length == 1) { 
 					return;
 				}
-				curPath.pop();
-				var path = getPath(curPath);
-				console.info("cd up : " + path);
-				ls(path);
+				jumpInto(curPath.length - 2);
 			});
 			
 			dirListTable.on('click', 'a.cdInto', function(e){
-				console.info("on cdInto, curPath : " + curPath);
+				// console.info("on cdInto, curPath : " + curPath);
 				var cdDir = $(this).text();
+				var lastDir = curPath[curPath.length - 1];
 				curPath.push(cdDir);
+				var lastChild = curZkPath.children().last();
+				lastChild.html('<a class="jumpInto" href="javascript:void(0);">' + lastDir + '</a>');
+				curZkPath.append('<li class="active">' + cdDir + "</li>");
 				var path = getPath(curPath);
 				ls(path);
 			});
@@ -118,16 +126,22 @@
 			});
 			
 			var jumpInto = function(index) {
-				var path = "";
-				if(index == 0) {
-					path = "/";
-				} else {
-					for(var i = 1; i <= index; i++) {
-						path = path + "/" + curPath[i];
-					}
+				for(var i = index + 1; i < curPath.length; i++) {
+					curPath.pop();
+					curZkPath.children().eq(i).remove();
 				}
+				var lastChild = curZkPath.children().last();
+				lastChild.addClass('active')
+							.text(curPath[index])
+							.children()
+							.remove();
+				var path = getPath(curPath);
 				console.info("will jump into : " + path);
 				ls(path);
+			};
+			
+			var showErrMsg = function(errMsg) {
+				alertArea.html(errMsg).show().delay(3000).hide(0);
 			};
 			
 			var processCurPath = function(path) {
@@ -151,12 +165,19 @@
 				}
 			};
 			
-			var ls = function(path) {
+			var ls = function(path, callback) {
 				$.get('ls', {
 					path: path
 				},function(resp){
-					showDirList(resp);
-					processCurPath(path);
+					if(!resp.success) {
+						showErrMsg(resp.errorMessage);
+						return;
+					}
+					showDirList(resp.row);
+					debugger;
+					if(callback != null && typeof callback === 'function') {
+						callback(path);
+					}
 				});
 			};
 			
@@ -164,10 +185,60 @@
 				$.get('get', {
 					path: path
 				}, function(resp){
-					// console.info(resp);
+					console.info(resp);
+					if(!resp.success) {
+						showErrMsg(resp.errorMessage);
+						return;
+					}
 					BootstrapDialog.show({
 						title: 'zk node info',
-						message: "This is the message"
+						type: 'type-default',
+						message: function(dialog) {
+							/* cZxid = 0x10000004f
+							ctime = Mon Oct 17 18:20:20 CST 2016
+							mZxid = 0x100000052
+							mtime = Mon Oct 17 18:20:20 CST 2016
+							pZxid = 0x10000004f
+							cversion = 0
+							dataVersion = 3
+							aclVersion = 0
+							ephemeralOwner = 0x0
+							dataLength = 75
+							numChildren = 0 */
+							
+							var row = resp.row;
+							var data = row.dataAsString;
+							var czxid = row.stat.czxid;
+							var ctime = row.stat.ctime;
+							var mzxid = row.stat.mzxid;
+							var mtime = row.stat.mtime;
+							var pzxid = row.stat.pzxid;
+							var cversion = row.stat.cversion;
+							var version = row.stat.version;
+							var aversion = row.stat.aversion;
+							var ephemeralOwner = row.stat.ephemeralOwner;
+							var dataLength = row.stat.dataLength;
+							var numChildren = row.stat.numChildren;
+							
+							var sdf = "yyyy-MM-dd HH:mm:ss.SSS";
+							
+							var $message = $('<div style="word-wrap:break-word;word-break:break-all;"></div>');
+							$message.append('<p>' + data + '</p>')
+									.append('<br />')
+									.append('<p> cZxid = ' + czxid + '</p>')
+									.append('<p> ctime = ' + $.format.date(ctime, sdf) + '</p>')
+									.append('<p> mZxid = ' + mzxid + '</p>')
+									.append('<p> mtime = ' + $.format.date(mtime, sdf) + '</p>')
+									.append('<p> pZxid = ' + pzxid + '</p>')
+									.append('<p> cversion = ' + cversion + '</p>')
+									.append('<p> dataVersion = ' + version + '</p>')
+									.append('<p> aclVersion = ' + aversion + '</p>')
+									.append('<p> ephemeralOwner = ' + ephemeralOwner + '</p>')
+									.append('<p> dataLength = ' + dataLength + '</p>')
+									.append('<p> numChildren = ' + numChildren + '</p>');
+							return $message;
+						
+						}
 					});
 				});
 			}
