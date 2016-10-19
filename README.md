@@ -37,7 +37,7 @@ cd zk-browser/bin
 
 On Windows, run `start.bat` instead.
 
-Open your web browser, visit [localhost:8080/zk-browser](localhost:8080/zk-browser)
+Open your web browser, visit ![localhost:8080/zk-browser](localhost:8080/zk-browser)
 
 ## Technology Stack
 
