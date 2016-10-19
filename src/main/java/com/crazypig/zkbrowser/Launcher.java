@@ -63,7 +63,7 @@ public class Launcher {
         String currentDir = new File(location.getPath()).getParent();
         File workDir = new File(currentDir, "work");
         context.setTempDirectory(workDir);
-
+        context.setExtraClasspath(new File(currentDir, "conf").getAbsolutePath());
         server.setHandler(context);
         return server;
 		
