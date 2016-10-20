@@ -36,10 +36,12 @@ finllay run :
 
 ```
 cd zk-browser/bin
-./start.sh
+./start.sh [-p 8080]
 ```
 
 On Windows, run `start.bat` instead.
+
+> default port is 8080, you can specify the port what you want.
 
 Open your web browser, visit [http://localhost:8080/zk-browser](http://localhost:8080/zk-browser)
 
