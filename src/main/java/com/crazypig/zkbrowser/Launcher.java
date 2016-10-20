@@ -4,6 +4,13 @@ import java.io.File;
 import java.net.URL;
 import java.security.ProtectionDomain;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -11,7 +18,7 @@ import org.eclipse.jetty.webapp.WebAppContext;
 
 /**
  * 
- * web应用启动器
+ * web app launcher
  * 
  * @author CrazyPig
  * @since 2016-08-03
@@ -23,10 +30,24 @@ public class Launcher {
 	public static final String DEFAULT_CONTEXT_PATH = "/zk-browser";
 	private static final String DEFAULT_APP_CONTEXT_PATH = "src/main/webapp";
 	
+	private static Options opts;
+	private static HelpFormatter hf = new HelpFormatter();
+	private static final String USAGE = "./startup.bat(startup.sh) -p <arg-p>";
+	
+	private static int port = DEFAULT_PORT;
 	
 	public static void main(String[] args) {
 		
-		runJettyServer(DEFAULT_PORT, DEFAULT_CONTEXT_PATH);
+		createOptions();
+		try {
+			parseOptions(args);
+		} catch (ParseException e) {
+//			e.printStackTrace();
+			hf.printHelp(USAGE, opts);
+			System.exit(-1);
+		}
+		
+		runJettyServer(port, DEFAULT_CONTEXT_PATH);
 		
 	}
 	
@@ -88,6 +109,31 @@ public class Launcher {
 		server.setHandler(webAppCtx);
 		
 		return server;
+	}
+	
+	private static void createOptions() {
+		
+		opts = new Options();
+		Option p = new Option("p", true, "port, default : " + DEFAULT_PORT);
+		p.setType(Integer.class);
+		opts.addOption(p);
+		opts.addOption(new Option("h", false, "print help"));
+	
+	}
+	
+	private static void parseOptions(String[] args) throws ParseException {
+		
+		CommandLineParser parser = new DefaultParser();
+		CommandLine cmdLine = parser.parse(opts, args);
+		
+		if(cmdLine.hasOption("h")) {
+			hf.printHelp(USAGE, opts);
+			System.exit(0);
+		}
+		
+		if(cmdLine.hasOption("p")) {
+			port = Integer.valueOf(cmdLine.getOptionValue("p"));
+		}
 	}
 	
 }
